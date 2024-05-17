@@ -40,6 +40,14 @@ h1 {
     margin-left: 10px; 
 }
 
+#event-filter {
+    padding: 8px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-left: 80px; 
+}
+
 .event-container {
     display: flex;
     flex-wrap: wrap;
