@@ -1,0 +1,90 @@
+<html>
+    <head>
+        <title>Events Calendar</title>
+        <link rel="stylesheet" href="calendar.css">
+        <link rel="stylesheet" href="evo-calendar.min.css"> 
+        <link rel="stylesheet" href="evo-calendar.midnight-blue.min.css"> 
+    </head>
+    <body>
+        <div class="hero">
+            <div id="calendar"></div>
+
+        </div> 
+
+        <script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
+        <script src="evo-calendar.min.js"></script>
+
+        <script>
+            $(document).ready(function() {
+                $('#calendar').evoCalendar({
+                    theme: "Midnight Blue",
+                    calendarEvents: [ 
+                        {
+                            id: 'sample',
+                            name: "My Birthday",
+                            date: "December/29/2004",
+                            description: "Durgesh's Birthday",
+                            type: "birthday",
+                        },
+                        {
+                            id: 'technical_1',
+                            name: "Mindcraft",
+                            date: "May/12/2024",
+                            description: "Join our exclusive workshop for hands-on learning and skill development. Limited slots available, book now!",
+                            type: "technical",
+                            everyYear: false
+                        },
+                        {
+                            id: 'cultural_1',
+                            name: "RiddleQuest",
+                            date: "June/08/2024",
+                            description: "Embark on an exciting journey of clues and challenges in our treasure hunt event. Register now and unleash your inner explorer!",
+                            type: "cultural",
+                            everyYear: false
+                        },
+                        {
+                            id: 'cultural_2',
+                            name: "Rang Utsav",
+                            date: "March/25/2024",
+                            description: "Celebrate the festival of colors with Zolo - an unforgettable Holi experience awaits!",
+                            type: "cultural",
+                            everyYear: false
+                        },
+                        {
+                            id: 'technical_2',
+                            name: "TechTrend Talks",
+                            date: "May/18/2024",
+                            description: "Engage in insightful conversations and gain valuable perspectives on AI advancements from industry experts.",
+                            type: "technical",
+                            everyYear: false
+                        },
+                        {
+                            id: 'cultural_3',
+                            name: "NSS Drive",
+                            date: "June/15/2024",
+                            description: "Be a hero and save lives by donating in our blood donation drive. Every drop counts!", 
+                            type: "cultural",
+                            everyYear: false
+                        },
+                        {
+                            id: 'sports_1',
+                            name: "Grand Master",
+                            date: "July/27/2024",
+                            description: "A premier chess competition showcasing the strategic prowess of college players.",
+                            type: "sports",
+                            everyYear: false
+                        },
+                        {
+                            id: 'cultural_4',
+                            name: "Garba Night",
+                            date: "October/11/2024",
+                            description: "Experience the vibrant colors, energetic dances, and spiritual fervor of Navratri at our annual Mohotsav event. Join us for nine nights of joyous celebration, devotion, and cultural immersion!",
+                            type: "cultural",
+                            everyYear: false
+                        } 
+                    ]
+                })
+            })
+        </script>
+    </body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="home/home.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1><a id="user_home" href="#" style="color: white;">CampusBuzz</a></h1>
+            <nav>
+                <ul>
+                    <li><a id="notifications" target="_parent">Notifications</a></li>
+                    <li><a target="_blank" id="events">Events</a></li>
+                    <li><a href="speakers/speakers.html" target="_blank">Speakers</a></li>
+                    <li><a href="calendar/calendar.html" target="_blank">Calendar</a></li> 
+                    <li><a href="contact_us/contact_us.html" target="_blank">Contact Us</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="background"></div>
+
+    <div class="btn-container">
+        <button id="bookseatbtn">Book Your Seat</button>
+    </div>
+
+    <script src="homescript.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const regno = urlParams.get("registrationNo");
+        
+        document.getElementById('bookseatbtn').addEventListener('click', function() {
+            window.location.href = `events/events.html?registrationNo=${regno}`;
+        });
+        document.getElementById('events').addEventListener('click', function() {
+            window.location.href = `events/events.html?registrationNo=${regno}`;
+        });
+        document.getElementById('notifications').addEventListener('click', function() {
+            window.location.href = `notifications/notifications.html?registrationNo=${regno}`;
+        });
+        document.getElementById('user_home').addEventListener('click', function() {
+            window.location.href = `home.html?registrationNo=${regno}`;
+        })
+    </script>
+</body>
+</html>
