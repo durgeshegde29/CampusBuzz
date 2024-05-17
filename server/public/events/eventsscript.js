@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const eventContainer = document.getElementById('event-container');
     const searchBar = document.getElementById('search-input');
     const eventCount = document.getElementById('event-count');
+    const eventFilter = document.getElementById('event-filter');
     const urlParams = new URLSearchParams(window.location.search);
     const regno = urlParams.get("registrationNo");
 
@@ -9,11 +10,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     fetchEvents();
     fetchEventCount(); // Fetch event count
 
-    async function fetchEvents() {
+    async function fetchEvents(filter = 'all') {
         try {
             const response = await fetch('http://localhost:3000/events');
             const eventsData = await response.json();
-            displayEvents(eventsData);
+            displayEvents(eventsData, filter);
         } catch (error) {
             console.error('Error fetching events:', error);
         }
@@ -29,10 +30,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    function displayEvents(eventsData) {
+    function displayEvents(eventsData, filter) {
         eventContainer.innerHTML = ''; // Clear previous event blocks
 
-        eventsData.forEach(event => {
+        const filteredEvents = eventsData.filter(event => {
+            if (filter === 'paid') return event.fee > 0;
+            if (filter === 'free') return event.fee === 0;
+            return true;
+        });
+
+        filteredEvents.forEach(event => {
             const eventBlock = createEventBlock(event);
             eventContainer.appendChild(eventBlock);
         });
@@ -73,7 +80,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         eventBlock.appendChild(registerBtn);
     
         return eventBlock;
-    }        
+    }
 
     async function registerEvent(eventId) {
         try {
@@ -108,5 +115,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 event.style.display = 'none';
             }
         });
+    });
+
+    // Filter functionality
+    eventFilter.addEventListener('change', function() {
+        const filterValue = eventFilter.value;
+        fetchEvents(filterValue);
     });
 });
