@@ -1,0 +1,1 @@
+CampusBuzz, the college event management system, is ingeniously crafted to streamline event registrations and facilitate seamless communication with students. Its intuitive user interface allows users to browse, reserve, and manage events easily.
