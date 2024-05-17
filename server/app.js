@@ -86,14 +86,26 @@ app.post('/admin', async (req, res) => {
 
 // Fetch events route
 app.get('/events', async (req, res) => {
+  const { filter } = req.query; // Get filter from query params
+
+  let filterQuery = '';
+  let queryParams = [];
+
+  if (filter === 'paid') {
+    filterQuery = 'WHERE events.fee > 0';
+  } else if (filter === 'free') {
+    filterQuery = 'WHERE events.fee = 0';
+  }
+
   try {
     const eventsQuery = `
       SELECT events.*, COUNT(registrations.event_id) AS registration_count
       FROM events
       LEFT JOIN registrations ON events.event_id = registrations.event_id
+      ${filterQuery}
       GROUP BY events.event_id
     `;
-    const { rows } = await client.query(eventsQuery);
+    const { rows } = await client.query(eventsQuery, queryParams);
     res.status(200).json(rows);
   } catch (error) {
     console.error('Error fetching events:', error);
@@ -132,31 +144,36 @@ app.get('/speakers', async (req, res) => {
 app.post('/register', async (req, res) => {
   const { event_id, registration_no } = req.body;
   if (!event_id || !registration_no) {
-    return res.status(400).json({ message: 'Event ID and registration number are required.' });
+      return res.status(400).json({ message: 'Event ID and registration number are required.' });
   }
   try {
-    const query = `
-      INSERT INTO registrations (registration_no, event_id)
-      VALUES ($1, $2)
-    `;
-    await client.query(query, [registration_no, event_id]);
+      const query = `
+          INSERT INTO registrations (registration_no, event_id)
+          VALUES ($1, $2)
+      `;
+      await client.query(query, [registration_no, event_id]);
 
-    // Insert into notifications
-    const eventNameQuery = 'SELECT event_name FROM events WHERE event_id = $1';
-    const { rows } = await client.query(eventNameQuery, [event_id]);
-    const eventName = rows[0].event_name;
-    
-    const insertQuery = `
-      INSERT INTO notifications (registration_no, message, created_at)
-      VALUES ($1, $2, CURRENT_TIMESTAMP)
-    `;
-    const notificationMessage = `You have registered for the event: ${eventName}`;
-    await client.query(insertQuery, [registration_no, notificationMessage]);
-    
-    res.status(200).json({ message: 'Successfully registered for the event.' });
+      // Insert into notifications
+      const eventNameQuery = 'SELECT event_name FROM events WHERE event_id = $1';
+      const { rows } = await client.query(eventNameQuery, [event_id]);
+      const eventName = rows[0].event_name;
+      
+      const insertQuery = `
+          INSERT INTO notifications (registration_no, message, created_at)
+          VALUES ($1, $2, CURRENT_TIMESTAMP)
+      `;
+      const notificationMessage = `You have registered for the event: ${eventName}`;
+      await client.query(insertQuery, [registration_no, notificationMessage]);
+      
+      res.status(200).json({ message: 'Successfully registered for the event.' });
   } catch (error) {
-    console.error('Error registering for event:', error);
-    res.status(500).send('Internal server error.');
+      console.error('Error registering for event:', error);
+
+      if (error.code === '23505') { // Unique violation error code for PostgreSQL
+          return res.status(409).json({ message: 'You have already registered for this event.' });
+      }
+
+      res.status(500).send('Internal server error.'); 
   }
 });
 
