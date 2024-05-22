@@ -5,10 +5,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const errorMessage = document.getElementById('error-message');
 
     signInForm.addEventListener('submit', function(event) {
-        event.preventDefault(); 
+        event.preventDefault();
 
         const registrationNo = regNumberInput.value.trim();
         const password = passwordInput.value.trim();
+        const recaptchaResponse = grecaptcha.getResponse();
+
+        if (!recaptchaResponse) {
+            errorMessage.textContent = 'Please complete the reCAPTCHA';
+            return;
+        }
 
         fetch('http://localhost:3000/signin', {
             method: 'POST',
@@ -17,7 +23,8 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             body: JSON.stringify({ 
                 registrationNo: registrationNo,
-                password: password 
+                password: password,
+                'g-recaptcha-response': recaptchaResponse
             })
         })
         .then(response => {
