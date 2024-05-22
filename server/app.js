@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 const { Client } = require('pg');
+const axios = require('axios');
 
 const app = express();
 const port = 3000;
@@ -18,6 +19,8 @@ const client = new Client({
 });
 
 client.connect();
+
+const RECAPTCHA_SECRET_KEY = '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe';
 
 // Sign up route
 app.post('/signup', async (req, res) => {
@@ -50,19 +53,36 @@ app.post('/signup', async (req, res) => {
 
 // Sign in route
 app.post('/signin', async (req, res) => {
-  const { registrationNo, password } = req.body;
+  const { registrationNo, password, 'g-recaptcha-response': recaptchaResponse } = req.body;
+
+  if (!recaptchaResponse) {
+    return res.status(400).json({ message: 'Please complete the reCAPTCHA' });
+  }
 
   try {
+    const response = await axios.post(`https://www.google.com/recaptcha/api/siteverify`, {}, {
+      params: {
+        secret: RECAPTCHA_SECRET_KEY,
+        response: recaptchaResponse
+      }
+    });
+
+    const { success } = response.data;
+
+    if (!success) {
+      return res.status(400).json({ message: 'reCAPTCHA verification failed' });
+    }
+
     const { rows } = await client.query('SELECT * FROM Users WHERE registration_no = $1 AND password = $2', [registrationNo, password]);
 
     if (rows.length > 0) {
-      res.status(200).json({ registrationNo: registrationNo }); // Send registration number as JSON
+      res.status(200).json({ registrationNo: registrationNo });
     } else {
-      res.status(401).send('Invalid registration number or password.');
+      res.status(401).json({ message: 'Invalid registration number or password.' });
     }
   } catch (error) {
     console.error('Error:', error.message);
-    res.status(500).send('Internal server error.');
+    res.status(500).json({ message: 'Internal server error.' });
   }
 });
 
@@ -191,8 +211,6 @@ app.get('/notifications', async (req, res) => {
     res.status(500).send('Internal server error.');
   }
 });
-
-// Other routes (e.g., fetching data, etc.)
 
 app.listen(port, () => {
   console.log(`App listening on port ${port}`);
